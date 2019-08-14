@@ -8,6 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
   <title>ACME Company Profits</title>
+  <style>
+    .selected{
+      background-color: tomato;
+    }
+  </style>
 </head>
 <body>
   <h1>Hi</h1>
@@ -15,20 +20,17 @@
 
   <script type="text/babel">
     const API = 'https://acme-users-api-rev.herokuapp.com/api';
-
     const { render } = ReactDOM;
     const { Component } = React;
     const { HashRouter, NavLink, Switch, Link, Route, Redirect } = ReactRouterDOM;
+    const Home = ()=>{
+      return <h2>Home</h2>
+    }
 
     const Companies = ({companies}) => {
-     console.log(companies)
-      const list = companies.map(company => {
-
-        <li>{company.name}</li>
-      })
       return (
         <ul>
-        {list}
+          {companies.map(company => <li>{company.name}</li>)}
         </ul>
         )
     }
@@ -57,22 +59,24 @@
       }
       async componentDidMount() {
         const companies = await axios.get(`${API}/companies`);
-        this.setState(companies.data)
+        // console.log(companies.data)
+        this.setState({companies: companies.data})
       }
+
       render() {
         const {companies} = this.state
         return(
           <HashRouter>
             <nav>
               <ul>
-                <NavLink to = '/#' activeClassName = 'selected'> Home </NavLink>
+                <NavLink to = '/home' activeClassName = 'selected'> Home </NavLink>
                 <NavLink to = '/companies' activeClassName = 'selected'> Companies </NavLink>
               </ul>
             </nav>
             <Switch>
-              <Route path = '/#' render = {() => <Home />} />
+              <Route path = '/home' render = {() => <Home />} />
               <Route path = '/companies' render = {() => <Companies companies = {companies} /> } />
-              <Redirect to='/#' />
+              <Redirect to='/home' />
             </Switch>
           </HashRouter>
         )
