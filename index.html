@@ -18,26 +18,67 @@
 
     const { render } = ReactDOM;
     const { Component } = React;
-    const { HashRouter, Switch, Link, Route, Redirect } = ReactRouterDOM;
+    const { HashRouter, NavLink, Switch, Link, Route, Redirect } = ReactRouterDOM;
+
+    const Companies = ({companies}) => {
+     console.log(companies)
+      const list = companies.map(company => {
+
+        <li>{company.name}</li>
+      })
+      return (
+        <ul>
+        {list}
+        </ul>
+        )
+    }
+
+    // class Company extends Component {
+    //   constructor(){
+    //     super();
+    //     this.state = {
+    //       id:''
+    //     }
+    //   }
+
+    //   render() {
+
+
+
+    //   }
+    // }
 
     class App extends Component {
       constructor() {
         super();
         this.state = {
-          companies: [],
-          profits: []
+          companies: []
         }
       }
       async componentDidMount() {
         const companies = await axios.get(`${API}/companies`);
-        console.log(companies);
+        this.setState(companies.data)
       }
       render() {
-        console.log(2);
-        return null;
+        const {companies} = this.state
+        return(
+          <HashRouter>
+            <nav>
+              <ul>
+                <NavLink to = '/#' activeClassName = 'selected'> Home </NavLink>
+                <NavLink to = '/companies' activeClassName = 'selected'> Companies </NavLink>
+              </ul>
+            </nav>
+            <Switch>
+              <Route path = '/#' render = {() => <Home />} />
+              <Route path = '/companies' render = {() => <Companies companies = {companies} /> } />
+              <Redirect to='/#' />
+            </Switch>
+          </HashRouter>
+        )
       }
     }
-    
+
     const root = document.querySelector("#root");
     render(<App/>, root);
   </script>
