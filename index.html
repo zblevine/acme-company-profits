@@ -29,29 +29,34 @@
 
     const Companies = ({companies, match}) => {
       return (
+        <div>
         <ul>
-          {companies.map(company => {
-            <li key={company.id}><Link to={`/companies/${company.id}`}>{company.name}</Link></li>)
-            }
+        {companies.map(company =>
+        <li key={company.id}>
+        <Link to={`/companies/${company.id}`}>{company.name}</Link>
+        </li>
+        )}
         </ul>
+        <Route path = '/companies/:id' render = {({match}) => <Company companies = {companies} match={match}/> } />
+        </div>
       )
     }
+
 
     class Company extends Component {
       constructor(){
          super();
-         console.log('hello');
          this.state = {
           company: {}
         }
       }
       async loadCompany(id) {
-        const company = (await axios.get(`${API}/companies/${this.props.match.params.id}`)).data;
+        const company = (await axios.get(`${API}/companies/${this.props.match.params.id}/companyProfits`)).data;
+        console.log(company)
         this.setState(company);
       }
 
       componentDidMount() {
-        console.log(this.props.match)
         this.loadCompany(this.props.match.params.id);
       }
       render() {
