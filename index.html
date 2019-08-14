@@ -27,28 +27,39 @@
       return <h2>Home</h2>
     }
 
-    const Companies = ({companies}) => {
+    const Companies = ({companies, match}) => {
       return (
         <ul>
-          {companies.map(company => <li>{company.name}</li>)}
+          {companies.map(company => {
+            <li key={company.id}><Link to={`/companies/${company.id}`}>{company.name}</Link></li>)
+            }
         </ul>
-        )
+      )
     }
 
-    // class Company extends Component {
-    //   constructor(){
-    //     super();
-    //     this.state = {
-    //       id:''
-    //     }
-    //   }
+    class Company extends Component {
+      constructor(){
+         super();
+         console.log('hello');
+         this.state = {
+          company: {}
+        }
+      }
+      async loadCompany(id) {
+        const company = (await axios.get(`${API}/companies/${this.props.match.params.id}`)).data;
+        this.setState(company);
+      }
 
-    //   render() {
+      componentDidMount() {
+        console.log(this.props.match)
+        this.loadCompany(this.props.match.params.id);
+      }
+      render() {
+        const { company } = this.state;
+        return null;
 
-
-
-    //   }
-    // }
+      }
+    }
 
     class App extends Component {
       constructor() {
@@ -75,13 +86,16 @@
             </nav>
             <Switch>
               <Route path = '/home' render = {() => <Home />} />
-              <Route path = '/companies' render = {() => <Companies companies = {companies} /> } />
+              <Route path = '/companies/:id?' render = {({match}) => <Companies companies = {companies} match={match}/> } />
+              <Route path = '/companies/:id' component={Company} />
               <Redirect to='/home' />
             </Switch>
           </HashRouter>
         )
       }
     }
+
+    //<Route path = '/companies' render = {() => <Companies companies = {companies} /> } />
 
     const root = document.querySelector("#root");
     render(<App/>, root);
