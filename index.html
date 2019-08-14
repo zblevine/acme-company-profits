@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+  <title>ACME Company Profits</title>
+</head>
+<body>
+  <h1>Hi</h1>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const API = 'https://acme-users-api-rev.herokuapp.com/api';
+
+    const { render } = ReactDOM;
+    const { Component } = React;
+    const { HashRouter, Switch, Link, Route, Redirect } = ReactRouterDOM;
+
+    class App extends Component {
+      constructor() {
+        super();
+        this.state = {
+          companies: [],
+          profits: []
+        }
+      }
+      async componentDidMount() {
+        const companies = await axios.get(`${API}/companies`);
+        console.log(companies);
+      }
+      render() {
+        console.log(2);
+        return null;
+      }
+    }
+    
+    const root = document.querySelector("#root");
+    render(<App/>, root);
+  </script>
+</body>
+</html>
