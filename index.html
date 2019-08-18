@@ -7,17 +7,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.1/react-router-dom.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
   <title>ACME Company Profits</title>
-  <style>
-    .selected{
-      background-color: tomato;
-    }
-  </style>
 </head>
 <body>
-  <h1>Hi</h1>
   <div id="root"></div>
-
   <script type="text/babel">
     const API = 'https://acme-users-api-rev.herokuapp.com/api';
     const { render } = ReactDOM;
@@ -28,41 +24,51 @@
     }
 
     const Companies = ({companies, match}) => {
+      console.log(match.params)
       return (
-        <div>
-        <ul>
+        <div className='list'>
+        <ul className='company-name'>
         {companies.map(company =>
         <li key={company.id}>
-        <Link to={`/companies/${company.id}`}>{company.name}</Link>
+          <Link to={`/companies/${company.id}`} className = {match.params.id === company.id? 'selected':''}>{company.name}</Link>
         </li>
         )}
         </ul>
-        <Route path = '/companies/:id' render = {({match}) => <Company companies = {companies} match={match}/> } />
+        <Route path = '/companies/:id' render = {({match}) => <Company companies = {companies}  match = {match}/>} />
         </div>
       )
     }
-
 
     class Company extends Component {
       constructor(){
          super();
          this.state = {
-          company: {}
+          profits:[]
         }
       }
-      async loadCompany(id) {
-        const company = (await axios.get(`${API}/companies/${this.props.match.params.id}/companyProfits`)).data;
-        console.log(company)
-        this.setState(company);
+
+      async componentDidMount() {
+        const id = this.props.match.params.id;
+        const profits = (await axios.get(`${API}/companies/${id}/companyProfits`)).data;
+        this.setState({profits});
       }
 
-      componentDidMount() {
-        this.loadCompany(this.props.match.params.id);
+      async componentDidUpdate(preProps){
+        const id = this.props.match.params.id;
+        if(id === preProps.match.params.id){
+          return;
+        }
+        const profits = (await axios.get(`${API}/companies/${id}/companyProfits`)).data;
+        this.setState({profits})
       }
+
       render() {
-        const { company } = this.state;
-        return null;
-
+        const { profits } = this.state;
+        return(
+          <ul className='company-detail'>
+            {profits.map(profit => <li key={profit.id} className='profit'><span>{profit.fiscalYear.slice(0,4)}</span><span>${profit.amount}</span></li>)}
+          </ul>
+        )
       }
     }
 
@@ -75,7 +81,6 @@
       }
       async componentDidMount() {
         const companies = await axios.get(`${API}/companies`);
-        // console.log(companies.data)
         this.setState({companies: companies.data})
       }
 
@@ -91,8 +96,9 @@
             </nav>
             <Switch>
               <Route path = '/home' render = {() => <Home />} />
-              <Route path = '/companies/:id?' render = {({match}) => <Companies companies = {companies} match={match}/> } />
-              <Route path = '/companies/:id' component={Company} />
+              <Route path = '/companies/:id?' render = {({match}) => <Companies companies = {companies} match = {match}/>} />
+
+
               <Redirect to='/home' />
             </Switch>
           </HashRouter>
@@ -100,7 +106,6 @@
       }
     }
 
-    //<Route path = '/companies' render = {() => <Companies companies = {companies} /> } />
 
     const root = document.querySelector("#root");
     render(<App/>, root);
